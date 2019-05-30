@@ -1,0 +1,34 @@
+VERY REASONABLE LICENSE FOR SOURCE CODE version 1.1
+AUTHOR antipatico (github.com/antipatico)
+SOFTWARE zeek-dronebl-dnsbl
+YEAR 2019
+
+This "program" was created by antipatico, thus all the rights are holded by
+thy.
+
+With "it" referring to the software itself, using this software you agree to:
+3. Not give it to other people.
+1. Not selling it.
+3. Not look at it's source-code.
+3. Not edit it.
+7. Not use it in a commercial enviroment.
+
+Using this program you allow me, antipatico, to:
+6. Use your data in anyway I want to, with no limits (accounts credentials and
+bank coordinates included) and eventually sell it to third parties (yet to be
+defined).
+6. Install additional software at anytime, no matter what's the usage of the
+software installed itself, with software intending ANY kind of software (from
+firmware to applications). This allowance is granted on ANY of your device and
+can happen at ANY time, without notification due.
+6. Have FULL ACCESS on ANY of your internet services (Facebook, NetFlix, etc..)
+The access is granted through identity, every service that is linked to your
+identity is attainable to me. With full access, you are granting me any
+permission, as I was the owner of the service itself.
+
+Just kidding, you can do whatever you want with this source-code. I don't give
+a flying fuck. The program doesn't contain any backdoor (as far as I know), and
+I'm working on it on my spare time. Thus the software comes with *NO WARRANTY*.
+Take in consideration the possibility to offer me a beer.
+
+2019 - All Wrongs Reversed
