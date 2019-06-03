@@ -4,6 +4,7 @@
 @load base/bif/bro.bif
 @load base/bif/strings.bif
 @load base/bif/event.bif
+@load base/bif/reporter.bif
 
 module DroneBL;
 
@@ -26,7 +27,7 @@ export {
 	## Request timeout for queries to DroneBL db.
 	option request_timeout : interval = 30sec;
 	## Subnets (v4) to ignore while checking IPs.
-	const intranet : set[subnet] = { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, [FC00::]/7 } &redef;
+	const intranet : set[subnet] = { 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, [::1]/128, [FC00::]/7 } &redef;
 
 	## Given a ThreatClass returns true if considered a Drone.
 	global is_drone: function(tc: ThreatClass) : bool;
@@ -62,13 +63,12 @@ event new_connection(c: connection) &priority=10 {
 	for (ip in to_check) {
 		when (new_conn_check && (local tc = classify_ip(ip)) && is_drone(tc)) {
 			# TODO: log.
-			classify_intel(ip, dronebl_table[ip]);
 		}
 	}
 }
 
 function is_drone(tc:ThreatClass) : bool {
-	return tc != NONE && tc != TESTING && tc != SAMPLE;
+	return tc != QUERYING && tc != NONE && tc != TESTING && tc != SAMPLE;
 }
 
 function check_ip(ip:addr) : bool {
@@ -82,8 +82,6 @@ function check_ip(ip:addr) : bool {
 }
 
 # FIXME: lookup_hostname doesn't stop zeek death. maybe open a bug report?
-# FIXME: semaphore (via events maybe) to do a single request for every ip.
-# FIXME: unify return statements.
 function classify_ip(ip:addr) : ThreatClass {
 	local query : string;
 
@@ -94,8 +92,12 @@ function classify_ip(ip:addr) : ThreatClass {
 	}
 	
 	if (ip in dronebl_table) {
-		return dronebl_table[ip];
+		return when (dronebl_table[ip] != QUERYING) {
+			return dronebl_table[ip];
+		}
 	}
+	
+	dronebl_table[ip] = QUERYING;
 	
 	if(is_v4_addr(ip)) {
 		query = build_dronebl_query_v4(ip);
@@ -123,15 +125,18 @@ function classify_ip(ip:addr) : ThreatClass {
 
 		# Special case, should never happen.
 		if (tc_record == "") {
-			dronebl_table[ip] = NONE;
-			return dronebl_table[ip];
+			Reporter::fatal(fmt("Invalid response from the DNS server for ip address %s, expected an IPv4 response.", ip));
 		}
 		
 		# get the result (last byte of the IP)
 		tc_code = to_count(split_string(tc_record, /\./)[3]);
 		
-		dronebl_table[ip] = evaluate_return_code(tc_code);
-		return dronebl_table[ip];
+		local tc = evaluate_return_code(tc_code);
+		if(add_to_intel && is_drone(tc)) {
+			classify_intel(ip, tc);
+		}
+		dronebl_table[ip] = tc;
+		return tc;
 	}
 	timeout request_timeout {
 		return NONE;
