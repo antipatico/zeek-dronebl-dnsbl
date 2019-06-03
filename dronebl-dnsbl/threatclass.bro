@@ -1,6 +1,9 @@
 # Author: antipatico (github.com/antipatico)
 # Year: 2019
 # License: VRLFSC (read the file LICENSE.txt)
+@load base/bif/bro.bif
+@load base/bif/reporter.bif
+
 module DroneBL;
 
 export {
@@ -91,7 +94,10 @@ function evaluate_return_code(code:count) : ThreatClass {
 		return DNS_MX_HOSTNAME_IRC;
 	case 19:
 		return VPN;
+	case 255:
+		return UNCATEGORIZED;
 	default:
+		Reporter::warning(fmt("Unrecognized return code from DroneBL-DNSBL: '%d' will be treated as UNCATEGORIZED", code));
 		return UNCATEGORIZED;
 	}
 }

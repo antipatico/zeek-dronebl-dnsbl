@@ -4,12 +4,14 @@
 @load ./common.bro
 @load base/bif/bro.bif
 @load base/bif/strings.bif
+@load base/bif/reporter.bif
 
 module DroneBL;
 
 function expand_ipv6(ip:addr) : string {
 	if (!is_v6_addr(ip)) {
-		return ""; #FIXME: throw an error.
+		Reporter::error(fmt("Can't expand IPv6 address: '%s' is not an IPv6 address.", ip));
+		return "";
 	}
 
 	# 1. ensure there are 8 hextets
@@ -32,7 +34,8 @@ function expand_ipv6(ip:addr) : string {
 
 function build_dronebl_query_v6(ip:addr) : string {
 	if (!is_v6_addr(ip)) {
-		return ""; #FIXME: throw an error.
+		Reporter::error(fmt("Can't build IPv6 DroneBL-DNSBL query: '%s' is not an IPv6 address.", ip));
+		return "";
 	}
 	#1. Expand the ipv6
 	#   E.G. 1337:::::::6969 -> 1337:0000:0000:0000:0000:0000:0000:6969
