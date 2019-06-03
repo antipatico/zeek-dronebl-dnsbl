@@ -101,3 +101,7 @@ function evaluate_return_code(code:count) : ThreatClass {
 		return UNCATEGORIZED;
 	}
 }
+
+# Add a special module-only class used for representing the querying status.
+# This is internally used as a semaphore, to only query each ip once.
+redef enum ThreatClass += { QUERYING };
