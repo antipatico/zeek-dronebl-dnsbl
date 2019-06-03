@@ -141,6 +141,8 @@ function classify_ip(ip:addr) : ThreatClass {
 		return tc;
 	}
 	timeout request_timeout {
+		Reporter::warning(fmt("DNS request timeout while querying for ip %s, ThreatClass set to NONE.", ip))
+		dronebl_table[ip] = NONE
 		return NONE;
 	}
 }
