@@ -73,7 +73,9 @@ function is_drone(tc:ThreatClass) : bool {
 
 function check_ip(ip:addr) : bool {
 	if (ip in dronebl_table) {
-		return is_drone(dronebl_table[ip]);
+		return when(dronebl_table[ip] != QUERYING) {
+			return is_drone(dronebl_table[ip]);
+		}
 	}
 
 	return when (local tc = classify_ip(ip) ) {
